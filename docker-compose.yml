@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  futrack_api:
+    container_name: futrack_api
+    image: shinsenter/laravel:latest
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      - LARAVEL_AUTO_MIGRATION=1
+      - DB_CONNECTION=pgsql
+      - DB_HOST=futrack_db
+      - DB_PORT=5432
+      - DB_DATABASE=futrack
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - futrack_db
+
+  futrack_db:
+    container_name: futrack_db
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: futrack
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  futrack_web:
+    container_name: futrack_web
+    build:
+      context: ../futrack_web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../futrack_web/src:/app
+    environment:
+      - NEXT_PUBLIC_API_URL=http://futrack_api
+    depends_on:
+      - futrack_api
+
+volumes:
+  db_data:
