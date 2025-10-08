@@ -42,8 +42,9 @@ services:
       - "3000:3000"
     volumes:
       - ../futrack_web/src:/app
+      - /app/node_modules
     environment:
-      - NEXT_PUBLIC_API_URL=http://futrack_api
+      - NEXT_PUBLIC_API_URL=http://futrack_api:8000
     depends_on:
       - futrack_api
 
